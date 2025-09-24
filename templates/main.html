@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Portfolio</title>
+    <style>
+        header {
+            background-color: grey;
+            padding: 10px 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .hero {
+            padding: 4px 2rem;
+            text-align: center;
+        }
+        .hero h2 {
+            color:
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .hero p {
+            color: black;
+            font-size: 1.1rem;
+        }
+        body {
+            background-color:grey;
+            font-family: Arial;
+            padding: 20px;
+        }
+        footer {
+            background-color: grey;
+            text-align: center;
+            padding: 20px;
+        }
+        nav {
+            padding: 10px;
+            text-align: right;
+        }
+        nav a {
+            margin-left: 15px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: brown;
+        }
+        .box {
+            background: grey;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 14px;
+            color: black;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background: pink;
+            color: white;
+        }
+        :root {
+        --bg: white;
+        --text: black;
+        }
+        html[data-theme="dark"] {
+        --bg: black;
+        --text: white;
+        }
+        body {
+        background: var(--bg);
+        color: var(--text);
+        transition: background 0.3s ease, color 0.3s ease;
+        }
+        #theme-toggle {
+        position: fixed;
+        right: 12px;
+        bottom:15px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        }
+        html { scroll-behavior: smooth; }
+        #contact form { max-width: 520px; margin: 0 auto; display: grid; gap: 10px; }
+        #contact input, #contact textarea {
+            width: 100%; padding: 10px; border: 1px solid #bbb; border-radius: 6px;
+            background: white; color: black;
+        }
+        html[data-theme="dark"] #contact input,
+        html[data-theme="dark"] #contact textarea {
+            background: #111; color: #e5e7eb; border-color: #333;
+        }
+        #contact textarea { min-height: 120px; resize: vertical; }
+        #contact button {
+            padding: 10px 16px; border: none; border-radius: 6px;
+            background: pink; color: black; font-weight: bold; cursor: pointer;
+        }
+        #contact button:hover { filter: brightness(0.95); }
+
+        #toast[hidden]{display:none;}
+        #toast{
+          position: fixed; top: 12px; left: 50%; transform: translate(-50%,-10px);
+          background: var(--bg); color: var(--text);
+          border: 1px solid currentColor; border-radius: 8px;
+          padding: 10px 14px; z-index: 10000;
+          box-shadow: 0 8px 24px rgba(0,0,0,.2);
+          opacity: 0; transition: opacity .2s ease, transform .2s ease;
+        }
+        #toast.show{ opacity:1; transform: translate(-50%,0); }
+        #toast.success{ border-color:#16a34a; }
+        #toast.error{ border-color:#dc2626; }
+
+        .profile-pic{ width:450px; height:auto; }
+    </style>
+    <script>
+function showToast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || '');
+  t.hidden = false;
+  requestAnimationFrame(()=> t.classList.add('show'));
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(()=>{
+    t.classList.remove('show');
+    setTimeout(()=> t.hidden = true, 200);
+  }, 2200);
+}
+
+function popup(e){
+  e && e.preventDefault && e.preventDefault();
+  const form = document.getElementById('contact-form');
+
+  
+  if(!form.checkValidity()){
+    form.reportValidity();
+    return false;
+  }
+
+  const btn = form.querySelector('button[type="submit"], button');
+  if(btn){ btn.disabled = true; btn.textContent = 'Sending...'; }
+
+  fetch('https://api.web3forms.com/submit', {
+    method:'POST',
+    body: new FormData(form)
+  })
+  .then(r => r.json().catch(()=>({success:r.ok})))
+  .then(j => {
+    if(j.success){
+      form.reset();
+      showToast('Success', 'success');
+    }else{
+      showToast('Unsuccess', 'error');
+    }
+  })
+  .catch(() => showToast('Unsuccess', 'error'))
+  .finally(() => { if(btn){ btn.disabled=false; btn.textContent='Send'; } });
+
+  return false;
+}
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Rikesh Khadka</h1>
+        <nav>
+            <a href="/projects">Projects</a>
+            <a href="#contact">Contact</a>
+            <a href="{{ url_for('static', filename='Rikesh Khadka  CV.pdf') }}">View CV</a>
+        </nav>
+    </header>
+    <script>
+  (function(){
+    const saved = localStorage.getItem("theme");
+    if(saved){
+      document.documentElement.setAttribute("data-theme", saved);
+    } 
+    else if 
+    (window.matchMedia("(prefers-color-scheme: dark)").matches){
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+    const header = document.querySelector("header");
+    const btn = document.createElement("button");
+    btn.id = "theme-toggle";
+    btn.textContent = document.documentElement.getAttribute("data-theme") === "dark"
+      ? " Light" : " Dark";
+    btn.onclick = () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      const next = current === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("theme", next);
+      btn.textContent = next === "dark" ? " Light" : " Dark";
+    };
+    header.appendChild(btn);
+  })();
+</script>
+    <section class="hero">
+        <img src="{{ url_for('static', filename='rikesh khadka.jpg') }}" alt="Rikesh Khadka" class="profile-pic">
+        <h2>Hi, I’m Rikesh 👋</h2>
+
+    <div class="box">
+        <h2>About Me</h2>
+        <p>
+        <p>Bachelor’s student from Kathmandu, Nepal, passionate about technology and focused on data analysis and data science. 
+         I’m also interested in coding overall, with growing interest and experience in backend development and DevOps.
+         I use Python to explore, clean, and visualize data to turn information into actionable insights, and I’m committed to continuous learning and improving my skills.</p>
+
+        </p>
+    </div>
+    <div class="box">
+        <h2>Skills</h2>
+        <p><b>Languages:</b> Python,HTML,CSS,PHP(beginner–intermediate)</p>
+        <p><b>Frameworks:</b> Flask</p>
+        <p><b>Data Analysis & ML:</b>Pandas, NumPy, Matplotlib, Seaborn, scikit-learn</p>
+        <p><b>Other:</b> Git, Basic OOP Concepts,SoftSkills</p>
+    </div>
+    <div class="box">
+        <h2>Highlighted Projects</h2>
+            <p><b>Portfolio Website:</b> This site built with Flask.</p>
+            <a class="btn" href="/projects">See All Projects</a>
+    </div>
+
+    <div id="contact" class="box" style="text-align:center;">
+        <h2>Let’s Connect!</h2>
+        <p>If you’d like to work together or just say hi or have any suggestion for me or my work feel free to reach out.</p>
+        <h2>Contact Me</h2>
+            <form id="contact-form" method="POST" action="">
+            <input type="hidden" name="access_key" value="8813e3cb-61d9-42ae-b052-fbbe51a7575a">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <textarea name="message" placeholder="Your Message" required></textarea>
+            <button type="submit" onclick="return popup(event)">Send</button>
+        </form>
+    </div>
+
+    
+    <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
+
+    <footer>
+        © 2025 Rikesh Khadka — Built with Flask & Python
+    </footer>
+</body>
+</html>
